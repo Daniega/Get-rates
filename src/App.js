@@ -16,6 +16,9 @@ const useStyles = makeStyles({
 	table: {
 		minWidth: 400,
 	},
+	tableContainer: {
+		maxHeight: 600,
+	},
 });
 
 function createData(name, calories, fat, carbs, protein) {
@@ -28,40 +31,81 @@ const rows = [
 	createData('Eclair', 262, 16.0, 24, 6.0),
 	createData('Cupcake', 305, 3.7, 67, 4.3),
 	createData('Gingerbread', 356, 16.0, 49, 3.9),
+	createData('Gingerbread', 356, 16.0, 49, 3.9),
+	createData('Gingerbread', 356, 16.0, 49, 3.9),
+	createData('Gingerbread', 356, 16.0, 49, 3.9),
+	createData('Gingerbread', 356, 16.0, 49, 3.9),
+	createData('Gingerbread', 356, 16.0, 49, 3.9),
+	createData('Gingerbread', 356, 16.0, 49, 3.9),
+	createData('Gingerbread', 356, 16.0, 49, 3.9),
+	createData('Gingerbread', 356, 16.0, 49, 3.9),
+	createData('Gingerbread', 356, 16.0, 49, 3.9),
+	createData('Gingerbread', 356, 16.0, 49, 3.9),
+];
+
+const tableHeaders = [
+	'Currency',
+	'Rate',
+	'Bid',
+	'Ask',
+	'High',
+	'Low',
+	'Open',
+	'Close',
+	'Timestamp',
 ];
 
 function App() {
 	const classes = useStyles();
+	const [state, setState] = useState({ numberOfTries: 0, lastTry: null });
+	const [data, setData] = useState([
+		{
+			Currency: 'EUR/USD',
+			Rate: '1.13625',
+			Bid: '1.13625',
+			Ask: '1.13638',
+			High: '1.14081',
+			Low: '1.13527',
+			Open: '1.13725',
+			Close: '1.13625',
+			Timestamp: '1551477238763',
+		},
+	]);
 
 	return (
 		<div className='app-container'>
 			<div className='table-container'>
-				<TableContainer component={Paper}>
-					<Table className={classes.table} aria-label='simple table'>
+				<TableContainer component={Paper} className={classes.tableContainer}>
+					<Table className={classes.table} size='small'>
 						<TableHead>
 							<TableRow>
-								<TableCell>Dessert (100g serving)</TableCell>
-								<TableCell align='right'>Calories</TableCell>
-								<TableCell align='right'>Fat&nbsp;(g)</TableCell>
-								<TableCell align='right'>Carbs&nbsp;(g)</TableCell>
-								<TableCell align='right'>Protein&nbsp;(g)</TableCell>
+								{tableHeaders.map((header, index) => {
+									return (
+										<TableCell align='left' key={index}>
+											{header}
+										</TableCell>
+									);
+								})}
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{rows.map((row) => (
-								<TableRow key={row.name}>
+							{rows.map((row, index) => (
+								<TableRow key={index}>
 									<TableCell component='th' scope='row'>
 										{row.name}
 									</TableCell>
-									<TableCell align='right'>{row.calories}</TableCell>
-									<TableCell align='right'>{row.fat}</TableCell>
-									<TableCell align='right'>{row.carbs}</TableCell>
-									<TableCell align='right'>{row.protein}</TableCell>
+									<TableCell align='left'>{row.calories}</TableCell>
+									<TableCell align='left'>{row.carbs}</TableCell>
+									<TableCell align='Left'>{row.protein}</TableCell>
+									<TableCell align='left'>{row.fat}</TableCell>
 								</TableRow>
 							))}
 						</TableBody>
 					</Table>
 				</TableContainer>
+				<Button variant='contained' color='primary'>
+					Get Data
+				</Button>
 			</div>
 		</div>
 	);
