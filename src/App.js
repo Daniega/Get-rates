@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 //Material UI
-import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,9 +8,14 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import LinearProgress from '@material-ui/core/LinearProgress';
+
+//services
+import { getData } from './services/rates';
+//constants
+import { TIME_TO_WAIT } from './services/rates';
 //styles
 import './App.css';
-
 const useStyles = makeStyles({
 	table: {
 		minWidth: 400,
@@ -20,28 +24,6 @@ const useStyles = makeStyles({
 		maxHeight: 600,
 	},
 });
-
-function createData(name, calories, fat, carbs, protein) {
-	return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-	createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-	createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-	createData('Eclair', 262, 16.0, 24, 6.0),
-	createData('Cupcake', 305, 3.7, 67, 4.3),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-	createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
 
 const tableHeaders = [
 	'Currency',
@@ -57,55 +39,58 @@ const tableHeaders = [
 
 function App() {
 	const classes = useStyles();
-	const [state, setState] = useState({ numberOfTries: 0, lastTry: null });
-	const [data, setData] = useState([
-		{
-			Currency: 'EUR/USD',
-			Rate: '1.13625',
-			Bid: '1.13625',
-			Ask: '1.13638',
-			High: '1.14081',
-			Low: '1.13527',
-			Open: '1.13725',
-			Close: '1.13625',
-			Timestamp: '1551477238763',
-		},
-	]);
+	const [rows, setRows] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		const getDataForRows = async () => {
+			setIsLoading(true); //show LinearProgress Bar
+			let data = await getData();
+			setRows(data);
+			setIsLoading(false); //after we get data, remove LinearProgress Bar
+		};
+		getDataForRows();
+		const dataInterval = setInterval(getDataForRows, TIME_TO_WAIT); //refresh data every 20 minutes
+		return () => clearInterval(dataInterval);
+	}, []);
 
 	return (
 		<div className='app-container'>
 			<div className='table-container'>
-				<TableContainer component={Paper} className={classes.tableContainer}>
-					<Table className={classes.table} size='small'>
-						<TableHead>
-							<TableRow>
-								{tableHeaders.map((header, index) => {
-									return (
-										<TableCell align='left' key={index}>
-											{header}
-										</TableCell>
-									);
-								})}
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{rows.map((row, index) => (
-								<TableRow key={index}>
-									<TableCell component='th' scope='row'>
-										{row.name}
-									</TableCell>
-									<TableCell align='left'>{row.calories}</TableCell>
-									<TableCell align='left'>{row.carbs}</TableCell>
-									<TableCell align='Left'>{row.protein}</TableCell>
-									<TableCell align='left'>{row.fat}</TableCell>
+				{isLoading ? (
+					<LinearProgress />
+				) : (
+					<TableContainer component={Paper} className={classes.tableContainer}>
+						<Table className={classes.table} size='small'>
+							<TableHead>
+								<TableRow>
+									{tableHeaders.map((header, index) => {
+										return (
+											<TableCell align='left' key={index}>
+												{header.toUpperCase()}
+											</TableCell>
+										);
+									})}
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</TableContainer>
-				<Button variant='contained' color='primary'>
-					Get Data
-				</Button>
+							</TableHead>
+							<TableBody>
+								{rows.map((row, index) => (
+									<TableRow key={index} hover>
+										<TableCell align='left'>{row.currency}</TableCell>
+										<TableCell align='left'>{row.rate}</TableCell>
+										<TableCell align='left'>{row.bid}</TableCell>
+										<TableCell align='left'>{row.ask}</TableCell>
+										<TableCell align='left'>{row.high}</TableCell>
+										<TableCell align='left'>{row.low}</TableCell>
+										<TableCell align='left'>{row.open}</TableCell>
+										<TableCell align='left'>{row.close}</TableCell>
+										<TableCell align='left'>{row.timestamp}</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</TableContainer>
+				)}
 			</div>
 		</div>
 	);
