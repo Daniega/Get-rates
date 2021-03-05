@@ -23,7 +23,7 @@ export const getData = async () => {
 					//if we receive actual data and not error message
 					saveToLocalStorage(STORAGE_KEY, data); //save the data to localStorage
 				}
-				return data;
+				return data; //if we fetched the data from API, return the data
 			})
 			.catch((error) => console.log(error));
 	}

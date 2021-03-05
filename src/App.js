@@ -24,7 +24,7 @@ const useStyles = makeStyles({
 		maxHeight: 600,
 	},
 });
-
+//Hard coded headers
 const tableHeaders = [
 	'Currency',
 	'Rate',
